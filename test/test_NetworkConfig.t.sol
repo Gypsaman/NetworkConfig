@@ -11,11 +11,24 @@ contract Test_NetworkConfig is Test {
     function setUp() public {
          deployer = new DeployNetworkConfig();
          network = deployer.run();
+        deployer.setup_sepolia();
     }
     
     function test_sepolia() public {
-        deployer.setup_sepolia();
         network.setNetworkToChainId(11155111);
         assertEq(11155111,network.getActiveNetworkChainId());
+    }
+
+    function test_getPrivateKey() public {
+        network.setNetworkToChainId(11155111);
+        assertEq(vm.envUint("PRIVATE_KEY"),network.getPrivateKey());
+    }
+    function test_getAllPriceFeeds() public {
+        network.setNetworkToChainId(11155111);
+        uint256 token_count = network.getTokens().length;
+        address[] memory feeds = new address[](token_count);
+        feeds = network.getAllPriceFeeds();
+        assertEq(token_count,feeds.length);
+        
     }
 }

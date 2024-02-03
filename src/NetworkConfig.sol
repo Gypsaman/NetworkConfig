@@ -231,13 +231,13 @@ contract NetworkConfig is Script {
     }
 
     function getPriceFeed(string memory coin) public view returns (address) {
-        if(!processes_needed['PriceFeed']){
+        if(!processes_needed['PriceFeeds']){
             revert ProcessNotImplemented('PriceFeed');
         }
         return activeNetworkDetails.getPriceFeed(coin);
     }
     function getAllPriceFeeds() public view returns (address[] memory) {
-        if(!processes_needed['PriceFeed']){
+        if(!processes_needed['PriceFeeds']){
             revert ProcessNotImplemented('PriceFeed');
         }
         address[] memory priceFeeds = new address[](tokensUsed.length);
