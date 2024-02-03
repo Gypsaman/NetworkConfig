@@ -210,7 +210,9 @@ contract NetworkConfig is Script {
             }
             if(processes_needed['PriceFeeds']){
                 for(uint16 indx=0;indx<tokensUsed.length;indx++){
-                    v3AggregatorMock = new MockV3Aggregator(DECIMALS, int256(2000*10**DECIMALS));
+                    v3AggregatorMock = new MockV3Aggregator(DECIMALS, 
+                        int256(token_price[tokensUsed[indx]]*10**DECIMALS)
+                        );
                     price_feeds[indx] = address(v3AggregatorMock);
                     emit HelperConfig_CreatedMock("PriceFeed",address(v3AggregatorMock));
                 }
