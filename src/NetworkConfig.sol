@@ -28,6 +28,7 @@ contract NetworkConfig is Script {
     mapping (string => bool) token_defined;
     mapping (uint256 => NetworkDetails) public Networks;
     mapping (uint256 => bool) private registered_networks;
+    mapping (string => uint256) public token_price;
 
     string[] processes_defined = ['VRFCoordinator','LinkToken','PriceFeeds','Tokens'];
     string[] tokensUsed;
@@ -132,10 +133,11 @@ contract NetworkConfig is Script {
         registered_networks[chain_id] = true;
     }
 
-    function addToken(uint256 chain_id, string memory token_name, address token_address) public {
+    function addToken(uint256 chain_id, string memory token_name, address token_address, uint256 mock_price) public {
         Networks[chain_id].addToken(token_name, token_address);
         if(!token_defined[token_name]){
             tokensUsed.push(token_name);
+            token_price[token_name] = mock_price;
             token_defined[token_name] = true;
         }
     }

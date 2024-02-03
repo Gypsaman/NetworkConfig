@@ -34,9 +34,10 @@ NetworkConfig config = new NetworkConfig(processes_needed);
 * @param: uint256 chainid
 * @param: string tokenSymbol: Symbol of token to add
 * @param: address tokeAddress: address of token contract
+* @param: uint256 mock_price: price of token in USD for mocks
 */
-config.addToken(chainid,'WETH',0xdd13E55209Fd76AfE204dBda4007C227904f0a81);
-config.addToken(chainid,'WBTC',0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063);
+config.addToken(chainid,'WETH',0xdd13E55209Fd76AfE204dBda4007C227904f0a81,2000);
+config.addToken(chainid,'WBTC',0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063,40000);
 # ...  Add as many tokens as needed
 ```
 
