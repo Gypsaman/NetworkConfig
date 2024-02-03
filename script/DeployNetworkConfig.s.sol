@@ -20,8 +20,8 @@ contract DeployNetworkConfig is Script {
 
         uint256 chainid = 11155111;
         network.createNetwork(chainid,vm.envUint("PRIVATE_KEY"),false);
-        network.addToken(chainid,'WETH',0xdd13E55209Fd76AfE204dBda4007C227904f0a81);
-        network.addToken(chainid,'WBTC',0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063);
+        network.addToken(chainid,'WETH',0xdd13E55209Fd76AfE204dBda4007C227904f0a81,2000);
+        network.addToken(chainid,'WBTC',0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063,40000);
         network.addPriceFeed(chainid,'WETH',0x694AA1769357215DE4FAC081bf1f309aDC325306);
         network.addPriceFeed(chainid,'WBTC',0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063);
         network.addVrfCoordinator(chainid,0.1 ether,60,0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625,0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c,0,500_000);

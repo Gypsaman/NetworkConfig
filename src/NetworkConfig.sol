@@ -97,7 +97,7 @@ contract NetworkConfig is Script {
 
 
         for(uint256 indx=0; indx < tokensUsed.length; indx++){
-            addToken(chainid,tokensUsed[indx],tokens_created[indx]);
+            addToken(chainid,tokensUsed[indx],tokens_created[indx],token_price[tokensUsed[indx]]);
         }
 
         for(uint256 indx=0; indx < pricefeeds_created.length; indx++){
