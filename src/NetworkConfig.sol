@@ -5,7 +5,7 @@ import {Script,console} from "forge-std/Script.sol";
 import {MockV3Aggregator} from "../mocks/mockV3Aggregator.sol";
 import {VRFCoordinatorV2Mock} from '../mocks/mockVRFCoordinatorV2.sol';
 import {LinkToken} from '../mocks/LinkToken.sol';
-import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import {mockToken} from '../mocks/mockERC20.sol';
 import {NetworkDetails} from "./NetworkDetails.sol";
 
 contract NetworkConfig is Script {
@@ -203,7 +203,7 @@ contract NetworkConfig is Script {
             }
             if(processes_needed['Tokens']){
                 for(uint16 indx=0;indx<tokensUsed.length;indx++){
-                    ERC20 token = new Token(tokensUsed[indx], tokensUsed[indx]);
+                    mockToken token = new mockToken(tokensUsed[indx], tokensUsed[indx]);
                     token_addresses[indx] = address(token);
                     emit HelperConfig_CreatedMock("Tokens",address(token));
                 }
@@ -296,9 +296,5 @@ contract NetworkConfig is Script {
 
 }
 
-contract Token is ERC20 {
-    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
-        _mint(msg.sender, 1000000000000000000000000);
-    }
-}
+
 
