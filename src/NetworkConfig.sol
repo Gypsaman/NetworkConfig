@@ -226,18 +226,46 @@ contract NetworkConfig is Script {
         );
     }
 
-    function get_pricefeed(string memory coin) public view returns (address) {
+    function getPriceFeed(string memory coin) public view returns (address) {
         if(!processes_needed['PriceFeed']){
             revert ProcessNotImplemented('PriceFeed');
         }
         return activeNetworkDetails.getPriceFeed(coin);
     }
+    function getAllPriceFeeds() public view returns (address[] memory) {
+        if(!processes_needed['PriceFeed']){
+            revert ProcessNotImplemented('PriceFeed');
+        }
+        address[] memory priceFeeds = new address[](tokensUsed.length);
+        for(uint16 indx=0;indx<tokensUsed.length;indx++){
+            priceFeeds[indx] = activeNetworkDetails.getPriceFeed(tokensUsed[indx]);
+        }
+        return priceFeeds;
+    }
     
-    function get_tokenAddress(string memory coin) public view returns (address) {
+    function getTokens() public view returns (string[] memory) {
+
+        if(!processes_needed['Tokens']){
+            revert ProcessNotImplemented('Tokens');
+        }
+        return tokensUsed;
+    }
+    function getTokenAddress(string memory coin) public view returns (address) {
         if(!processes_needed['Tokens']){
             revert ProcessNotImplemented('Tokens');
         }
         return activeNetworkDetails.getTokenAddress(coin);
+    }
+    function getAllTokenAddresses() public view returns (address[] memory) {
+        if(!processes_needed['Tokens']){
+            revert ProcessNotImplemented('Tokens');
+        }
+        string[] memory tokens = getTokens();
+        address[] memory tokenAddresses = new address[](tokens.length);
+        for(uint16 indx=0;indx<tokens.length;indx++){
+            tokenAddresses[indx] = activeNetworkDetails.getTokenAddress(tokens[indx]);
+        }
+        return tokenAddresses;
     }
     function get_vrfcoordinator_config() public view returns (uint256,uint256,address,bytes32,uint64,uint32) {
         if(!processes_needed['VRFCoordinator']){
