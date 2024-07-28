@@ -101,3 +101,6 @@ This functions sets the active network to be utilized in the config.
 */
 config.setActiveNetwork(block.chainid);
 ```
+
+# TODO
+replace the lib/chainlink and lib/openzeppelin-contracts with their respective "@chainlink" "@OpenZeppelin"
