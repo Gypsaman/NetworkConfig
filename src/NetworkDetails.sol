@@ -40,12 +40,12 @@ contract NetworkDetails {
         verify = _verify;
     }
 
-    function addToken(string memory tokenName, address tokenAddress) public {
+    function _addToken(string memory tokenName, address tokenAddress) public {
         tokenNames.push(tokenName);
         tokens.push(tokenAddress);
         coinToTokens[tokenName] = tokenAddress;
     }
-    function addPriceFeed(string memory tokenName, address priceFeed) public {
+    function _addPriceFeed(string memory tokenName, address priceFeed) public {
         priceFeeds.push(priceFeed);
         coinToPriceFeeds[tokenName] = priceFeed;
     }
@@ -58,13 +58,13 @@ contract NetworkDetails {
     function getpriceFeed(string memory coin) public view returns (address) {
         return coinToPriceFeeds[coin];
     }
-    function getTokenAddress(string memory coin) public view returns (address) {
+    function _getTokenAddress(string memory coin) public view returns (address) {
         return coinToTokens[coin];
     }
-    function getPriceFeed(string memory coin) public view returns (address) {
+    function _getPriceFeed(string memory coin) public view returns (address) {
         return coinToPriceFeeds[coin];
     }
-    function getPrivateKey() public view returns (uint256) {
+    function _getPrivateKey() public view returns (uint256) {
         return private_key;
     }
     function getvrfCoordinatorConfig() public view returns (VRFCoordinatorConfig memory) {

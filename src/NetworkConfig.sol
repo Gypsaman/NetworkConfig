@@ -14,10 +14,11 @@ contract NetworkConfig is Script {
     error MockNotAvailable(string mock_name);
     error ProcessNotImplemented(string process_name);
     error ProcessNotDefined(string process_name);
-    error NetworkConfig_TokenNamesLengthMismatch(uint256 chain_id);
-    error NetworkConfig_PriceFeedLengthMismatch(uint256 chain_id);
+    error TokenNamesLengthMismatch(uint256 chain_id);
+    error PriceFeedLngthMismatch(uint256 chain_id);
     error TokenNotUsed(string token_name);
-    error NetworkConfig_NetworkNotRegistered(uint256 chain_id);
+    error NetworkNotRegistered(uint256 chain_id);
+    error MocksAlreadyDeployed();
 
     // Constants
     uint8 public constant DECIMALS = 8;
@@ -38,7 +39,7 @@ contract NetworkConfig is Script {
 
     // Events
 
-    event HelperConfig_CreatedMock(string indexed  mock_type, address mock);
+    event MockCreated(string indexed  mock_type, address mock);
 
     constructor(string[] memory mocks_requested) {
 
@@ -63,10 +64,10 @@ contract NetworkConfig is Script {
             activeNetworkDetails = Networks[chain_id];
         }
         if (processes_needed['Tokens'] && (activeNetworkDetails.getTokenNames().length != activeNetworkDetails.getTokenCount())) {
-            revert NetworkConfig_TokenNamesLengthMismatch(chain_id);
+            revert TokenNamesLengthMismatch(chain_id);
         }
         if (processes_needed['PriceFeeds'] &&(activeNetworkDetails.getTokenCount() != activeNetworkDetails.getPriceFeedCount())) {
-            revert NetworkConfig_PriceFeedLengthMismatch(chain_id);
+            revert PriceFeedLngthMismatch(chain_id);
         }
         if (processes_needed['VRFCoordinator'] && (activeNetworkDetails.getvrfCoordinator() == address(0))) {
             revert MockNotAvailable('VRFCoordinator');
@@ -75,7 +76,7 @@ contract NetworkConfig is Script {
 
     function setNetworkToChainId(uint chain_id) public {
         if (!registered_networks[chain_id]) {
-            revert NetworkConfig_NetworkNotRegistered(chain_id);
+            revert NetworkNotRegistered(chain_id);
         }
         activeNetworkDetails = Networks[chain_id];
     }
@@ -85,6 +86,9 @@ contract NetworkConfig is Script {
     }
 
     function setup_development_chain() internal returns (NetworkDetails) {
+        if (mock_deployed) {
+            revert MocksAlreadyDeployed();
+        }
         uint chainid = block.chainid;
         createNetwork(chainid,vm.envUint("PRIVATE_KEY_DEVELOPMENT"),false);
         NetworkDetails development_network = new NetworkDetails(chainid, vm.envUint("PRIVATE_KEY_DEVELOPMENT"), false);
@@ -134,7 +138,7 @@ contract NetworkConfig is Script {
     }
 
     function addToken(uint256 chain_id, string memory token_name, address token_address, uint256 mock_price) public {
-        Networks[chain_id].addToken(token_name, token_address);
+        Networks[chain_id]._addToken(token_name, token_address);
         if(!token_defined[token_name]){
             tokensUsed.push(token_name);
             token_price[token_name] = mock_price;
@@ -145,7 +149,7 @@ contract NetworkConfig is Script {
         if(!token_defined[token_name]){
             revert TokenNotUsed(token_name);
         }
-        Networks[chain_id].addPriceFeed(token_name, price_feed);
+        Networks[chain_id]._addPriceFeed(token_name, price_feed);
     }
     function addVrfCoordinator(
         uint256 chainid,
@@ -189,38 +193,37 @@ contract NetworkConfig is Script {
         uint96 baseFee = 0.25 ether; //0.25 LINK
         uint96 gasPriceLink = 1e9; //1 Gwei LINK
 
-        if (mock_deployed == false){
-            vm.startBroadcast();
 
-            if(processes_needed['VRFCoordinator']){
-                vrfCoordinatorMock = new VRFCoordinatorV2Mock(baseFee, gasPriceLink);
-                emit HelperConfig_CreatedMock("VRF Coordinator",address(vrfCoordinatorMock));
-            }
-            if(processes_needed['LinkToken']){
+        vm.startBroadcast();
 
-                linkToken = new LinkToken();
-                emit HelperConfig_CreatedMock("LinkToken",address(linkToken));
-            }
-            if(processes_needed['Tokens']){
-                for(uint16 indx=0;indx<tokensUsed.length;indx++){
-                    mockToken token = new mockToken(tokensUsed[indx], tokensUsed[indx]);
-                    token_addresses[indx] = address(token);
-                    emit HelperConfig_CreatedMock("Tokens",address(token));
-                }
-            }
-            if(processes_needed['PriceFeeds']){
-                for(uint16 indx=0;indx<tokensUsed.length;indx++){
-                    v3AggregatorMock = new MockV3Aggregator(DECIMALS, 
-                        int256(token_price[tokensUsed[indx]]*10**DECIMALS)
-                        );
-                    price_feeds[indx] = address(v3AggregatorMock);
-                    emit HelperConfig_CreatedMock("PriceFeed",address(v3AggregatorMock));
-                }
-            }
-            vm.stopBroadcast();
-            mock_deployed = true;
-            
+        if(processes_needed['VRFCoordinator']){
+            vrfCoordinatorMock = new VRFCoordinatorV2Mock(baseFee, gasPriceLink);
+            emit MockCreated("VRF Coordinator",address(vrfCoordinatorMock));
         }
+        if(processes_needed['LinkToken']){
+
+            linkToken = new LinkToken();
+            emit MockCreated("LinkToken",address(linkToken));
+        }
+        if(processes_needed['Tokens']){
+            for(uint16 indx=0;indx<tokensUsed.length;indx++){
+                mockToken token = new mockToken(tokensUsed[indx], tokensUsed[indx]);
+                token_addresses[indx] = address(token);
+                emit MockCreated("Tokens",address(token));
+            }
+        }
+        if(processes_needed['PriceFeeds']){
+            for(uint16 indx=0;indx<tokensUsed.length;indx++){
+                v3AggregatorMock = new MockV3Aggregator(DECIMALS, 
+                    int256(token_price[tokensUsed[indx]]*10**DECIMALS)
+                    );
+                price_feeds[indx] = address(v3AggregatorMock);
+                emit MockCreated("PriceFeed",address(v3AggregatorMock));
+            }
+        }
+        vm.stopBroadcast();
+        mock_deployed = true;
+            
 
         return (
             token_addresses,
@@ -234,7 +237,7 @@ contract NetworkConfig is Script {
         if(!processes_needed['PriceFeeds']){
             revert ProcessNotImplemented('PriceFeed');
         }
-        return activeNetworkDetails.getPriceFeed(coin);
+        return activeNetworkDetails._getPriceFeed(coin);
     }
     function getAllPriceFeeds() public view returns (address[] memory) {
         if(!processes_needed['PriceFeeds']){
@@ -258,7 +261,7 @@ contract NetworkConfig is Script {
         if(!processes_needed['Tokens']){
             revert ProcessNotImplemented('Tokens');
         }
-        return activeNetworkDetails.getTokenAddress(coin);
+        return activeNetworkDetails._getTokenAddress(coin);
     }
     function getAllTokenAddresses() public view returns (address[] memory) {
         if(!processes_needed['Tokens']){
@@ -291,7 +294,7 @@ contract NetworkConfig is Script {
     }
 
     function getPrivateKey() public view returns (uint256) {
-        return activeNetworkDetails.getPrivateKey();
+        return activeNetworkDetails._getPrivateKey();
     }
 
 }
