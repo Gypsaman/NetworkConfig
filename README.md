@@ -6,7 +6,7 @@ Provides a mechanism to supply configurations of different Live networks, includ
 
 `smartcontractkit/chainlink` @ https://github.com/smartcontractkit/chainlink/commit/2e8e16820b02a9ca83aa46e7ae2deac31eaf08aa
 
-`
+`OpenZeppelin/.openzeppelin-contracts` @ https://github.com/OpenZeppelin/openzeppelin-contracts/commit/448efeea6640bbbc09373f03fbc9c88e280147ba
 
 ## Configurations Provided
 - Tokens
