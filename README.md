@@ -2,11 +2,18 @@
 
 Provides a mechanism to supply configurations of different Live networks, including testnets.  It also creates needed mocks for the development network(s).
 
+## Dependencies:
+
+`smartcontractkit/chainlink` @ https://github.com/smartcontractkit/chainlink/commit/2e8e16820b02a9ca83aa46e7ae2deac31eaf08aa
+
+`
+
 ## Configurations Provided
 - Tokens
 - PriceFeeds (Aggregators)
 - LinkToken
 - VrfCoordinator
+
 
 ## Usage
 In this example we utilize all four processes, if the process is not needed you can omit.
@@ -14,6 +21,7 @@ In this example we utilize all four processes, if the process is not needed you 
 string[] processes_needed = ['VRFCoordinator','LinkToken','PriceFeeds','Tokens'];
 
 NetworkConfig config = new NetworkConfig(processes_needed);
+
 
 /*
 * @param: uint256 chainid
